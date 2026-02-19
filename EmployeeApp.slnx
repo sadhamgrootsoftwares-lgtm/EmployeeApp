@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="EmployeeApp.API/EmployeeApp.API.csproj" />
+  <Project Path="EmployeeApp.Client/EmployeeApp.Client.csproj" />
+  <Project Path="EmployeeApp.Shared/EmployeeApp.Shared.csproj" />
+</Solution>
