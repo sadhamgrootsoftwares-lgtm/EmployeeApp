@@ -1,4 +1,4 @@
-@page "/register"
+﻿@* @page "/register"
 @using EmployeeApp.Shared
 @using EmployeeApp.Client.Services
 @inject AuthService AuthService
@@ -92,6 +92,157 @@
             }
         }
         catch (Exception ex)
+        {
+            errorMessage = "An error occurred during registration.";
+        }
+        finally
+        {
+            isSubmitting = false;
+        }
+    }
+} *@
+
+
+@page "/register"
+@using EmployeeApp.Shared
+@using EmployeeApp.Client.Services
+@inject AuthService AuthService
+@inject NavigationManager Navigation
+@inject IJSRuntime JSRuntime
+
+<div class="bg-dark text-light min-vh-100 d-flex align-items-center">
+
+    <div class="container">
+        <div class="row justify-content-center">
+
+            <div class="col-md-5 col-lg-4">
+
+                <div class="card bg-black text-light shadow-lg border border-danger rounded-4">
+
+                    <div class="card-header text-center border-bottom border-danger bg-black py-4">
+                        <h3 class="fw-bold text-danger mb-0">
+                            📝 Create Account
+                        </h3>
+                    </div>
+
+                    <div class="card-body p-4">
+
+                        @if (!string.IsNullOrEmpty(errorMessage))
+                        {
+                            <div class="alert alert-danger text-center">
+                                @errorMessage
+                            </div>
+                        }
+
+                        <EditForm Model="registerModel" OnValidSubmit="HandleRegister">
+                            <DataAnnotationsValidator />
+
+                            <!-- FULL NAME -->
+                            <div class="mb-4">
+                                <label class="form-label text-secondary">Full Name</label>
+                                <InputText @bind-Value="registerModel.FullName"
+                                           class="form-control bg-dark text-light border-secondary" />
+                                <ValidationMessage For="@(() => registerModel.FullName)" />
+                            </div>
+
+                            <!-- EMAIL -->
+                            <div class="mb-4">
+                                <label class="form-label text-secondary">Email</label>
+                                <InputText @bind-Value="registerModel.Email"
+                                           class="form-control bg-dark text-light border-secondary" />
+                                <ValidationMessage For="@(() => registerModel.Email)" />
+                            </div>
+
+                            <!-- PASSWORD -->
+                            <div class="mb-4">
+                                <label class="form-label text-secondary">Password</label>
+
+                                <div class="input-group">
+                                    <InputText @bind-Value="registerModel.Password"
+                                               type="@(showPassword ? "text" : "password")"
+                                               class="form-control bg-dark text-light border-secondary" />
+
+                                    <button class="btn btn-outline-danger"
+                                            type="button"
+                                            @onclick="TogglePasswordVisibility">
+                                        <i class="bi @(showPassword ? "bi-eye-slash" : "bi-eye")"></i>
+                                    </button>
+                                </div>
+
+                                <ValidationMessage For="@(() => registerModel.Password)" />
+                            </div>
+
+                            <!-- ROLE -->
+                            <div class="mb-4">
+                                <label class="form-label text-secondary">Role</label>
+                                <select @bind="registerModel.Role"
+                                        class="form-select bg-dark text-light border-secondary">
+                                    <option value="User">User</option>
+                                    <option value="Admin">Admin</option>
+                                </select>
+                            </div>
+
+                            <!-- REGISTER BUTTON -->
+                            <button type="submit"
+                                    class="btn btn-danger w-100 py-2 fw-semibold shadow"
+                                    disabled="@isSubmitting">
+
+                                @if (isSubmitting)
+                                {
+                                    <span class="spinner-border spinner-border-sm me-2"></span>
+                                }
+
+                                Register
+                            </button>
+
+                        </EditForm>
+                    </div>
+
+                    <div class="card-footer text-center bg-black border-top border-secondary py-3">
+                        <span class="text-secondary">
+                            Already have an account?
+                        </span>
+                        <a href="/login" class="text-danger fw-semibold ms-2">
+                            Login
+                        </a>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private RegisterModel registerModel = new();
+    private string errorMessage = "";
+    private bool isSubmitting = false;
+    private bool showPassword = false;
+
+    private void TogglePasswordVisibility()
+    {
+        showPassword = !showPassword;
+    }
+
+    private async Task HandleRegister()
+    {
+        isSubmitting = true;
+        errorMessage = "";
+        try
+        {
+            var result = await AuthService.Register(registerModel);
+            if (result.IsSuccess)
+            {
+                await JSRuntime.InvokeVoidAsync("alert", "Registration successful! Please login.");
+                Navigation.NavigateTo("/login");
+            }
+            else
+            {
+                errorMessage = result.Message;
+            }
+        }
+        catch (Exception)
         {
             errorMessage = "An error occurred during registration.";
         }

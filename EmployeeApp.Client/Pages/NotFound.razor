@@ -1,5 +1,102 @@
-﻿@page "/not-found"
+﻿@* @page "/notfound"
 @layout MainLayout
 
-<h3>Not Found</h3>
-<p>Sorry, the content you are looking for does not exist.</p>
+<div class="d-flex flex-column justify-content-center align-items-center text-center vh-100">
+
+    <h1 class="display-1 fw-bold text-primary">404</h1>
+
+    <h3 class="fw-semibold mb-3">Oops! Page Not Found</h3>
+
+    <p class="text-muted mb-4">
+        The page you are looking for might have been removed,
+        renamed, or is temporarily unavailable.
+    </p>
+
+    <div class="d-flex gap-3">
+        <AuthorizeView>
+            <Authorized>
+                <a href="/index" class="btn btn-primary px-4">
+                    <i class="bi bi-people"></i> Employees List
+                </a>
+            </Authorized>
+            <NotAuthorized>
+                <a href="/" class="btn btn-primary px-4">
+                    <i class="bi bi-house-door"></i> Home
+                </a>
+            </NotAuthorized>
+        </AuthorizeView>
+
+        <button class="btn btn-outline-secondary px-4" @onclick="GoBack">
+            <i class="bi bi-arrow-left"></i> Go Back
+        </button>
+    </div>
+
+</div>
+
+@code {
+    [Inject] NavigationManager Navigation { get; set; } = default!;
+
+    private void GoBack()
+    {
+        Navigation.NavigateTo("/");
+    }
+} *@
+
+@page "/notfound"
+@layout MainLayout
+
+<div class="bg-dark text-light min-vh-100 d-flex flex-column justify-content-center align-items-center text-center">
+
+    <div class="container">
+
+        <h1 class="display-1 fw-bold text-danger mb-3">
+            404
+        </h1>
+
+        <h3 class="fw-semibold mb-3">
+            Oops! Page Not Found
+        </h3>
+
+        <p class="text-secondary mb-5 col-lg-6 mx-auto">
+            The page you are looking for might have been removed,
+            renamed, or is temporarily unavailable.
+        </p>
+
+        <div class="d-flex justify-content-center gap-3 flex-wrap">
+
+            <AuthorizeView>
+                <Authorized>
+                    <a href="/index" class="btn btn-danger px-4 py-2 shadow">
+                        <i class="bi bi-people me-2"></i>
+                        Employees Dashboard
+                    </a>
+                </Authorized>
+
+                <NotAuthorized>
+                    <a href="/" class="btn btn-danger px-4 py-2 shadow">
+                        <i class="bi bi-house-door me-2"></i>
+                        Home
+                    </a>
+                </NotAuthorized>
+            </AuthorizeView>
+
+            <button class="btn btn-outline-light px-4 py-2"
+                    @onclick="GoBack">
+                <i class="bi bi-arrow-left me-2"></i>
+                Go Back
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+@code {
+    [Inject] NavigationManager Navigation { get; set; } = default!;
+
+    private void GoBack()
+    {
+        Navigation.NavigateTo("/");
+    }
+}

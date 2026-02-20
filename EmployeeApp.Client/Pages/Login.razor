@@ -1,4 +1,4 @@
-@page "/login"
+﻿@* @page "/login"
 @using EmployeeApp.Shared
 @using EmployeeApp.Client.Services
 @inject AuthService AuthService
@@ -70,7 +70,7 @@
             var result = await AuthService.Login(loginModel);
             if (result.IsSuccess)
             {
-                Navigation.NavigateTo("/");
+                Navigation.NavigateTo("/index");
             }
             else
             {
@@ -78,6 +78,138 @@
             }
         }
         catch (Exception ex)
+        {
+            errorMessage = "An error occurred during login.";
+        }
+        finally
+        {
+            isSubmitting = false;
+        }
+    }
+} *@
+
+
+
+@page "/login"
+@using EmployeeApp.Shared
+@using EmployeeApp.Client.Services
+@inject AuthService AuthService
+@inject NavigationManager Navigation
+
+<div class="bg-dark text-light min-vh-100 d-flex align-items-center">
+
+    <div class="container">
+        <div class="row justify-content-center">
+
+            <div class="col-md-5 col-lg-4">
+
+                <div class="card bg-black text-light shadow-lg border border-danger rounded-4">
+
+                    <div class="card-header text-center border-bottom border-danger bg-black py-4">
+                        <h3 class="fw-bold text-danger mb-0">
+                            🔐 Login to Your Account
+                        </h3>
+                    </div>
+
+                    <div class="card-body p-4">
+
+                        @if (!string.IsNullOrEmpty(errorMessage))
+                        {
+                            <div class="alert alert-danger text-center">
+                                @errorMessage
+                            </div>
+                        }
+
+                        <EditForm Model="loginModel" OnValidSubmit="HandleLogin">
+                            <DataAnnotationsValidator />
+
+                            <!-- EMAIL -->
+                            <div class="mb-4">
+                                <label class="form-label text-secondary">Email</label>
+                                <InputText @bind-Value="loginModel.Email"
+                                           class="form-control bg-dark text-light border-secondary" />
+                                <ValidationMessage For="@(() => loginModel.Email)" />
+                            </div>
+
+                            <!-- PASSWORD -->
+                            <div class="mb-4">
+                                <label class="form-label text-secondary">Password</label>
+
+                                <div class="input-group">
+                                    <InputText @bind-Value="loginModel.Password"
+                                               type="@(showPassword ? "text" : "password")"
+                                               class="form-control bg-dark text-light border-secondary" />
+
+                                    <button class="btn btn-outline-danger"
+                                            type="button"
+                                            @onclick="TogglePasswordVisibility">
+                                        <i class="bi @(showPassword ? "bi-eye-slash" : "bi-eye")"></i>
+                                    </button>
+                                </div>
+
+                                <ValidationMessage For="@(() => loginModel.Password)" />
+                            </div>
+
+                            <!-- LOGIN BUTTON -->
+                            <button type="submit"
+                                    class="btn btn-danger w-100 py-2 fw-semibold shadow"
+                                    disabled="@isSubmitting">
+
+                                @if (isSubmitting)
+                                {
+                                    <span class="spinner-border spinner-border-sm me-2"></span>
+                                }
+
+                                Login
+                            </button>
+
+                        </EditForm>
+                    </div>
+
+                    <div class="card-footer text-center bg-black border-top border-secondary py-3">
+                        <span class="text-secondary">
+                            Don't have an account?
+                        </span>
+                        <a href="/register" class="text-danger fw-semibold ms-2">
+                            Register
+                        </a>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private LoginModel loginModel = new();
+    private string errorMessage = "";
+    private bool isSubmitting = false;
+    private bool showPassword = false;
+
+    private void TogglePasswordVisibility()
+    {
+        showPassword = !showPassword;
+    }
+
+    private async Task HandleLogin()
+    {
+        isSubmitting = true;
+        errorMessage = "";
+        try
+        {
+            var result = await AuthService.Login(loginModel);
+            if (result.IsSuccess)
+            {
+                Navigation.NavigateTo("/index");
+            }
+            else
+            {
+                errorMessage = result.Message;
+            }
+        }
+        catch (Exception)
         {
             errorMessage = "An error occurred during login.";
         }

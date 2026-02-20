@@ -1,4 +1,4 @@
-﻿@inherits LayoutComponentBase
+﻿@* @inherits LayoutComponentBase
 @using EmployeeApp.Client.Services
 @inject AuthService AuthService
 @inject NavigationManager Navigation
@@ -39,4 +39,10 @@
         await JSRuntime.InvokeVoidAsync("alert", "You have been logged out successfully.");
         Navigation.NavigateTo("login");
     }
-}
+} *@
+
+@inherits LayoutComponentBase
+
+<div class="bg-dark text-light min-vh-100">
+    @Body
+</div>
