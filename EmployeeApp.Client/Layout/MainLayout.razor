@@ -1,42 +1,6 @@
 ﻿@inherits LayoutComponentBase
-@using EmployeeApp.Client.Services
-@inject AuthService AuthService
-@inject NavigationManager Navigation
-@inject IJSRuntime JSRuntime
-<div class="page">
-    <div class="sidebar">
-        <NavMenu />
-    </div>
 
-    <main>
-        <div class="top-row px-4">
-            <AuthorizeView>
-                <Authorized>
-                    <span class="me-3">
-                        <i class="bi bi-person-circle fs-5 align-middle me-2"></i>
-                        <span class="fw-bold">@context.User.Claims.FirstOrDefault(c => c.Type == "FullName")?.Value</span>
-                    </span>
-                    <button class="btn btn-link text-dark text-decoration-none" @onclick="Logout">
-                        <i class="bi bi-box-arrow-right fs-5 align-middle me-1"></i> Logout
-                    </button>
-                </Authorized>
-                <NotAuthorized>
-                    <a href="https://learn.microsoft.com/aspnet/core/" target="_blank">About</a>
-                </NotAuthorized>
-            </AuthorizeView>
-        </div>
-
-        <article class="content px-4">
-            @Body
-        </article>
-    </main>
+<div class="bg-dark text-light min-vh-100">
+    @Body
 </div>
 
-@code {
-    private async Task Logout()
-    {
-        AuthService.Logout();
-        await JSRuntime.InvokeVoidAsync("alert", "You have been logged out successfully.");
-        Navigation.NavigateTo("login");
-    }
-}
