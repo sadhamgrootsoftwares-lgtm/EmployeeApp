@@ -1,4 +1,3 @@
-
 @page "/index"
 @using EmployeeApp.Shared
 @using EmployeeApp.Client.Services
@@ -14,17 +13,28 @@
 
     <div class="container">
 
-        <!-- HEADER -->
         <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2 class="fw-bold text-danger">Employee Dashboard</h2>
 
-            <AuthorizeView Roles="Admin">
-                <button class="btn btn-danger px-4 shadow"
-                        @onclick="() => { isReadOnly = false; ShowEmployeeModal(); }">
-                    + Add Employee
+            <div class="d-flex align-items-center gap-3">
+                <button class="btn btn-outline-light"
+                        @onclick="GoToHome">
+                    <i class="bi bi-house-door me-2"></i>
+                    Home
                 </button>
-            </AuthorizeView>
-        </div>
+
+                <h2 class="fw-bold text-danger mb-0 mx-5">
+                    <u>Employee Dashboard</u>
+                </h2>
+            </div>
+
+    <AuthorizeView Roles="Admin">
+        <button class="btn btn-danger px-4 shadow"
+                @onclick="() => { isReadOnly = false; ShowEmployeeModal(); }">
+            + Add Employee
+        </button>
+    </AuthorizeView>
+
+</div>
 
         @if (employees == null)
         {
@@ -95,6 +105,153 @@
 
     </div>
 </div>
+
+@if (showModal)
+{
+    <div class="modal fade show" style="display:block" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content bg-black text-light border border-danger rounded-4">
+
+                <div class="modal-header border-bottom border-danger">
+                    <h5 class="modal-title text-danger">
+                        @(currentEmployee.Id == 0 ? "Add Employee" :
+                                            (isReadOnly ? "Employee Details" : "Edit Employee"))
+                    </h5>
+                    <button type="button"
+                            class="btn-close btn-close-white"
+                            @onclick="CloseModal">
+                    </button>
+                </div>
+
+                <div class="modal-body">
+
+                    <EditForm Model="currentEmployee" OnValidSubmit="SaveEmployee">
+                        <DataAnnotationsValidator />
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label text-secondary">First Name</label>
+                                <InputText @bind-Value="currentEmployee.FirstName"
+                                           class="form-control bg-dark text-light border-secondary"
+                                           disabled="@isReadOnly" />
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label text-secondary">Last Name</label>
+                                <InputText @bind-Value="currentEmployee.LastName"
+                                           class="form-control bg-dark text-light border-secondary"
+                                           disabled="@isReadOnly" />
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label text-secondary">Email</label>
+                            <InputText @bind-Value="currentEmployee.Email"
+                                       class="form-control bg-dark text-light border-secondary"
+                                       disabled="@isReadOnly" />
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label text-secondary">Department</label>
+                                <InputText @bind-Value="currentEmployee.Department"
+                                           class="form-control bg-dark text-light border-secondary"
+                                           disabled="@isReadOnly" />
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label text-secondary">Designation</label>
+                                <InputText @bind-Value="currentEmployee.Designation"
+                                           class="form-control bg-dark text-light border-secondary"
+                                           disabled="@isReadOnly" />
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label text-secondary">Salary</label>
+                                <InputNumber @bind-Value="currentEmployee.Salary"
+                                             class="form-control bg-dark text-light border-secondary"
+                                             disabled="@isReadOnly" />
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label text-secondary">Date of Joining</label>
+                                <InputDate @bind-Value="currentEmployee.DateOfJoining"
+                                           class="form-control bg-dark text-light border-secondary"
+                                           disabled="@isReadOnly" />
+                            </div>
+                        </div>
+
+                        <div class="modal-footer border-top border-secondary">
+                            <button type="button"
+                                    class="btn btn-outline-light"
+                                    @onclick="CloseModal">
+                                Close
+                            </button>
+
+                            @if (!isReadOnly)
+                            {
+                                <button type="submit" class="btn btn-danger">
+                                    Save Changes
+                                </button>
+                            }
+                        </div>
+
+                    </EditForm>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-backdrop fade show"></div>
+}
+
+@if (showDeleteModal)
+{
+    <div class="modal fade show" style="display:block" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content bg-black text-light border border-danger rounded-4">
+
+                <div class="modal-header border-bottom border-danger">
+                    <h5 class="modal-title text-danger">
+                        Confirm Delete
+                    </h5>
+                    <button type="button"
+                            class="btn-close btn-close-white"
+                            @onclick="CloseDeleteModal">
+                    </button>
+                </div>
+
+                <div class="modal-body">
+                    <p>
+                        Are you sure you want to delete
+                        <strong class="text-danger">@deleteEmpName</strong>?
+                    </p>
+                    <p class="text-secondary">
+                        This action cannot be undone.
+                    </p>
+                </div>
+
+                <div class="modal-footer border-top border-secondary">
+                    <button class="btn btn-outline-light"
+                            @onclick="CloseDeleteModal">
+                        Cancel
+                    </button>
+
+                    <button class="btn btn-danger"
+                            @onclick="DeleteEmployee">
+                        Delete
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-backdrop fade show"></div>
+}
 
 @code {
     private List<Employee>? employees;
@@ -214,5 +371,9 @@
                 await JSRuntime.InvokeVoidAsync("alert", "Error deleting employee: " + ex.Message);
             }
         }
+    }
+    private void GoToHome()
+    {
+        Navigation.NavigateTo("/");
     }
 }
